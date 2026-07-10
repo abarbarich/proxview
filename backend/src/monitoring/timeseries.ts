@@ -1,5 +1,5 @@
 import { getDb } from '../db/index.js';
-import type { SiteSnapshot } from './types.js';
+import type { PbsSnapshot, SiteSnapshot } from './types.js';
 
 const RETENTION_MS = Number(process.env.RETENTION_DAYS ?? 30) * 86_400_000;
 
@@ -27,6 +27,32 @@ export function recordSnapshot(snap: SiteSnapshot): void {
   const stmt = getDb().prepare('INSERT INTO timeseries(series_key, ts, value) VALUES(?, ?, ?)');
   getDb().transaction(() => {
     for (const r of rows) stmt.run(r[0], r[1], r[2]);
+  })();
+}
+
+/**
+ * Persist a PBS server's host metrics from a poll. Stored under the node namespace
+ * with a synthetic node name 'pbs' (the siteId is unique, so it can't collide with a
+ * real PVE node) — this keeps the reader and the demo-series generator uniform.
+ */
+export function recordPbsSnapshot(snap: PbsSnapshot): void {
+  if (!snap.reachable) return;
+  const ts = Math.floor(Date.now() / 1000);
+  const rows: Array<[string, number]> = [];
+  if (snap.host) {
+    rows.push([nodeSeriesKey(snap.siteId, 'pbs', 'cpu'), snap.host.cpu]);
+    rows.push([
+      nodeSeriesKey(snap.siteId, 'pbs', 'mem'),
+      snap.host.maxmem ? snap.host.mem / snap.host.maxmem : 0,
+    ]);
+  }
+  if (snap.temps?.cpu != null) rows.push([nodeSeriesKey(snap.siteId, 'pbs', 'temp'), snap.temps.cpu]);
+  if (snap.power != null && snap.power > 0)
+    rows.push([nodeSeriesKey(snap.siteId, 'pbs', 'watts'), snap.power]);
+  if (!rows.length) return;
+  const stmt = getDb().prepare('INSERT INTO timeseries(series_key, ts, value) VALUES(?, ?, ?)');
+  getDb().transaction(() => {
+    for (const [k, v] of rows) stmt.run(k, ts, v);
   })();
 }
 

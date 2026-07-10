@@ -15,7 +15,7 @@ import {
   getSiteTemps,
   getSiteWatts,
 } from './temps.js';
-import { pruneOld, recordSnapshot } from './timeseries.js';
+import { pruneOld, recordPbsSnapshot, recordSnapshot } from './timeseries.js';
 import type { PbsSnapshot, SiteSnapshot } from './types.js';
 
 const DEMO_INTERVAL = 2_500; // snappier for the demo UI
@@ -86,6 +86,7 @@ async function tick(): Promise<void> {
           const sw = getSiteSystemWatts(cfg.siteId);
           if (sw) snap.systemPower = sw;
           storePbs(snap);
+          recordPbsSnapshot(snap); // persist host history (real mode only)
         }),
       ]);
     }
