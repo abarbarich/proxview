@@ -48,7 +48,7 @@ export default function SetupPage() {
   return (
     <AuthCard
       title="Create your admin account"
-      subtitle="First-run setup. Use the one-time token printed to the container logs."
+      subtitle="First-run setup. Paste the one-time token that ProxView printed to your container logs."
     >
       <form className="form" onSubmit={submit}>
         <label className="field">
@@ -56,11 +56,23 @@ export default function SetupPage() {
           <input
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            placeholder="from docker compose logs"
+            placeholder="paste the one-time token from your logs"
             autoComplete="off"
             required
           />
         </label>
+        <details className="auth-hint">
+          <summary>Where do I find this token?</summary>
+          <p>
+            For security it's printed only to the container logs (not this page), so only
+            someone with server access can finish setup. Grab it with:
+          </p>
+          <code className="cmd">docker logs proxview 2&gt;&amp;1 | grep -m1 'setup?token'</code>
+          <p>
+            Using compose? Use <code>docker compose logs app</code> instead. Restarting the
+            container issues a fresh token.
+          </p>
+        </details>
         <label className="field">
           <span>Username</span>
           <input

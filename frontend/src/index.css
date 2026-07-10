@@ -1944,3 +1944,39 @@ a {
 .check-row input {
   accent-color: var(--accent);
 }
+
+/* --- First-run setup: "where's my token?" hint ------------------------- */
+.auth-hint {
+  margin: -2px 0 2px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.auth-hint summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+  list-style: none;
+}
+.auth-hint summary::-webkit-details-marker {
+  display: none;
+}
+.auth-hint summary::before {
+  content: '›';
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.15s ease;
+}
+.auth-hint[open] summary::before {
+  transform: rotate(90deg);
+}
+.auth-hint p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+.auth-hint code {
+  font-family: var(--mono);
+  color: var(--info-text);
+}
+.auth-hint .cmd {
+  margin: 8px 0;
+}
