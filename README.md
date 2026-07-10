@@ -1,6 +1,6 @@
 # ProxView
 
-![CI](https://github.com/abarbarich/proxview/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/freewaretools/proxview/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 ![Docker ready](https://img.shields.io/badge/docker-ready-2496ED?logo=docker&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
@@ -53,7 +53,7 @@ never left open to the world.
 ## Quick start (Docker)
 
 ```bash
-git clone https://github.com/abarbarich/proxview.git && cd proxview
+git clone https://github.com/freewaretools/proxview.git && cd proxview
 cp .env.example .env          # optionally set PROXVIEW_SECRET_KEY (openssl rand -hex 32)
 docker compose up -d --build
 ```
@@ -74,7 +74,7 @@ DEMO=1 docker compose up -d --build
 ```
 
 > Prefer not to build locally? A prebuilt multi-arch image is published to
-> `ghcr.io/abarbarich/proxview:latest` on each tagged release — set that as the `app`
+> `ghcr.io/freewaretools/proxview:latest` on each tagged release — set that as the `app`
 > service's `image:` in `docker-compose.yml` to pull instead of build.
 
 ## Deploy as a Proxmox LXC (one command)
@@ -88,7 +88,7 @@ Run it **on a Proxmox VE host** as root — it creates the container, installs D
 ProxView, provisions the admin, and prints a **ready-to-use URL + login** (no token dance):
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/freewaretools/proxview/main/proxmox/proxview-lxc.sh)"
 ```
 
 Defaults to an unprivileged CT — 2 vCPU / 1 GB RAM / 6 GB disk on `vmbr0` (DHCP). Override
@@ -97,7 +97,7 @@ anything with env vars:
 ```bash
 CTID=131 STORAGE=local-zfs RAM_MB=2048 \
   NET=192.168.1.50/24 GATEWAY=192.168.1.1 \
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/freewaretools/proxview/main/proxmox/proxview-lxc.sh)"
 ```
 
 By default it **auto-generates** a strong admin password and prints it. To choose your own,
@@ -105,7 +105,7 @@ prepend it to the command (no file editing — this is not the compose path):
 
 ```bash
 PROXVIEW_ADMIN_PASSWORD='choose-your-own' \
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/freewaretools/proxview/main/proxmox/proxview-lxc.sh)"
 ```
 
 The container is **LAN-only** — reach it across networks with the in-app Cloudflare/Tailscale

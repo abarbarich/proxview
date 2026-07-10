@@ -5,7 +5,7 @@
 # Creates an unprivileged Debian 12 LXC, installs Docker, and runs the published
 # ProxView image — ready to use. Run this ON A PROXMOX VE HOST as root:
 #
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/freewaretools/proxview/main/proxmox/proxview-lxc.sh)"
 #
 # Everything is configurable via environment variables (see DEFAULTS below), e.g.
 #   STORAGE=local-zfs RAM_MB=2048 CT_HOSTNAME=proxview bash proxview-lxc.sh
@@ -24,7 +24,7 @@ GATEWAY="${GATEWAY:-}"                              # required only for a static
 STORAGE="${STORAGE:-local-lvm}"                    # where the CT rootfs lives
 TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-local}"      # where CT templates live
 UNPRIVILEGED="${UNPRIVILEGED:-1}"
-PROXVIEW_IMAGE="${PROXVIEW_IMAGE:-ghcr.io/abarbarich/proxview:latest}"
+PROXVIEW_IMAGE="${PROXVIEW_IMAGE:-ghcr.io/freewaretools/proxview:latest}"
 PROXVIEW_PORT="${PROXVIEW_PORT:-8080}"
 # Same names as the Docker/compose deploy (PROXVIEW_ADMIN_*), with short aliases.
 # Blank password = auto-generate a strong one and print it at the end.
@@ -98,7 +98,7 @@ pct create "$CTID" "$TEMPLATE_REF" \
   --unprivileged "$UNPRIVILEGED" \
   --features nesting=1,keyctl=1 \
   --onboot 1 \
-  --description "ProxView — read-only Proxmox VE + PBS dashboard (https://github.com/abarbarich/proxview)" \
+  --description "ProxView — read-only Proxmox VE + PBS dashboard (https://github.com/freewaretools/proxview)" \
   >/dev/null
 ok "Container created."
 
