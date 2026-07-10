@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: proxview:latest
+    container_name: proxview
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+      DATA_DIR: /data
+      DEMO: "${DEMO:-0}"
+      PROXVIEW_SECRET_KEY: "${PROXVIEW_SECRET_KEY:-}"
+    volumes:
+      - ./data:/data
+    # Bound to localhost only — expose it deliberately via a plugin below.
+    ports:
+      - "127.0.0.1:${PORT:-8080}:8080"
+
+  # --- Optional plugin: Cloudflare Tunnel (activate with --profile cloudflare) ---
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: proxview-cloudflared
+    command: tunnel --no-autoupdate run
+    # Compose interpolates every service (even inactive profiles) at load time, so this
+    # must not use ${VAR:?} — that would break a plain `docker compose up`. Set
+    # CF_TUNNEL_TOKEN in .env before activating the cloudflare profile.
+    environment:
+      TUNNEL_TOKEN: "${CF_TUNNEL_TOKEN:-}"
+    restart: unless-stopped
+    depends_on:
+      - app
+    profiles:
+      - cloudflare

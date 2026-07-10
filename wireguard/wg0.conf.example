@@ -1,0 +1,18 @@
+# ProxView WireGuard client config.
+# Copy this to wireguard/wg0.conf and fill in the placeholders.
+# Generate ProxView's keys in Settings -> Connectivity (or `wg genkey | tee priv | wg pubkey`).
+
+[Interface]
+# ProxView's PRIVATE key
+PrivateKey = <PROXVIEW_PRIVATE_KEY>
+# ProxView's address on the WireGuard subnet
+Address = 10.13.13.2/32
+
+[Peer]
+# Your WireGuard server / gateway PUBLIC key
+PublicKey = <SERVER_PUBLIC_KEY>
+# Public endpoint of your WireGuard server
+Endpoint = your.server.example.com:51820
+# Subnets ProxView should reach through the tunnel (your nodes' LAN or specific IPs)
+AllowedIPs = 192.168.1.0/24
+PersistentKeepalive = 25

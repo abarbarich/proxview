@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+data
+.env
+.git
+.github
+*.log
+.DS_Store
+wireguard/*.conf
+README.md
+CONTRIBUTING.md

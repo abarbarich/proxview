@@ -1,0 +1,29 @@
+# Tailscale plugin — tailnet-only HTTPS via Tailscale Serve.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.tailscale.yml up -d
+#
+# The app joins the tailscale container's network namespace, and Serve proxies
+# tailnet HTTPS to it. Set TS_AUTHKEY in .env (a reusable auth key or, better,
+# an OAuth client secret with --advertise-tags). ProxView becomes reachable at
+# https://proxview.<your-tailnet>.ts.net — only from your tailnet.
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: proxview-tailscale
+    hostname: proxview
+    environment:
+      TS_AUTHKEY: "${TS_AUTHKEY:?set TS_AUTHKEY in .env to use the tailscale plugin}"
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_SERVE_CONFIG: /config/serve.json
+      TS_EXTRA_ARGS: "${TS_EXTRA_ARGS:-}"
+    volumes:
+      - ./data/tailscale:/var/lib/tailscale
+      - ./serve-config.json:/config/serve.json:ro
+    restart: unless-stopped
+
+  app:
+    # Move the app into tailscale's network namespace and drop the localhost bind.
+    network_mode: service:tailscale
+    ports: !reset []
+    depends_on:
+      - tailscale

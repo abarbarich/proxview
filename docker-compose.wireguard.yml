@@ -1,0 +1,32 @@
+# WireGuard plugin — a private tunnel from ProxView to your Proxmox/PBS nodes.
+#
+#   1. Generate ProxView's keypair in Settings → Connectivity (or `wg genkey`), then
+#      copy wireguard/wg0.conf.example -> wireguard/wg0.conf and fill it in.
+#   2. docker compose -f docker-compose.yml -f docker-compose.wireguard.yml up -d
+#
+# ProxView joins the tunnel and reaches nodes by their WireGuard/LAN IPs. It stays
+# reachable on 127.0.0.1:PORT (published on the wireguard container whose netns it shares).
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: proxview-wireguard
+    cap_add:
+      - NET_ADMIN
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "${TZ:-UTC}"
+    volumes:
+      - ./wireguard:/config/wg_confs
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    ports:
+      - "127.0.0.1:${PORT:-8080}:8080"
+    restart: unless-stopped
+
+  app:
+    # Move the app into the wireguard tunnel's network namespace.
+    network_mode: service:wireguard
+    ports: !reset []
+    depends_on:
+      - wireguard
