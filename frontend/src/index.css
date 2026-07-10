@@ -2082,24 +2082,18 @@ a {
 .settings-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: var(--bg);
+  gap: 4px;
 }
 .settings-nav-item {
-  padding: 9px 15px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
   background: transparent;
   color: var(--text-muted);
   font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
   white-space: nowrap;
 }
 .settings-nav-item:hover {
@@ -2107,8 +2101,9 @@ a {
   color: var(--text);
 }
 .settings-nav-item.active {
+  background: var(--surface-2);
+  border-color: var(--border);
   color: var(--text);
-  border-bottom-color: var(--accent);
   font-weight: 600;
 }
 .settings-content {
