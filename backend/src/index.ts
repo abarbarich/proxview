@@ -59,7 +59,9 @@ async function main(): Promise<void> {
   await registerTools(app);
   await registerConnectivity(app);
 
-  app.get('/api/health', async () => ({
+  // logLevel:'silent' — the Docker HEALTHCHECK hits this every 30s; without this its
+  // request logs would bury the first-run setup banner (and spam the logs generally).
+  app.get('/api/health', { logLevel: 'silent' }, async () => ({
     status: 'ok',
     name: 'ProxView',
     version: env.version,
@@ -95,7 +97,18 @@ async function main(): Promise<void> {
   // On a fresh install, print a one-time setup link (invalidates on each restart).
   if (needsSetup()) {
     const token = regenerateSetupToken();
-    printSetupBanner(token);
+    const show = (): void => {
+      if (needsSetup()) printSetupBanner(token);
+    };
+    // Print just after boot so the link lands after Fastify's own "listening" logs —
+    // i.e. it's the LAST thing on a fresh start. Then keep re-printing it at the tail
+    // every 60s while setup is pending, so `docker logs` always ends with it.
+    setTimeout(show, 250).unref();
+    const reminder = setInterval(() => {
+      if (needsSetup()) printSetupBanner(token);
+      else clearInterval(reminder);
+    }, 60_000);
+    reminder.unref();
   }
 }
 
