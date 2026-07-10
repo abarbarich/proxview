@@ -100,11 +100,18 @@ CTID=131 STORAGE=local-zfs RAM_MB=2048 \
   bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
 ```
 
-By default it auto-generates a strong admin password (set `PROXVIEW_USER` / `PROXVIEW_PASSWORD`
-to choose your own). The container is **LAN-only** — reach it across networks with the in-app
-Cloudflare/Tailscale wizards. (Tunables: `CTID`, `CT_HOSTNAME`, `CORES`, `RAM_MB`, `DISK_GB`,
-`BRIDGE`, `NET`, `GATEWAY`, `STORAGE`, `PROXVIEW_PORT`, `PROXVIEW_IMAGE`, `PROXVIEW_USER`,
-`PROXVIEW_PASSWORD`.)
+By default it **auto-generates** a strong admin password and prints it. To choose your own,
+prepend it to the command (no file editing — this is not the compose path):
+
+```bash
+PROXVIEW_ADMIN_PASSWORD='choose-your-own' \
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
+```
+
+The container is **LAN-only** — reach it across networks with the in-app Cloudflare/Tailscale
+wizards. (Tunables: `CTID`, `CT_HOSTNAME`, `CORES`, `RAM_MB`, `DISK_GB`, `BRIDGE`, `NET`,
+`GATEWAY`, `STORAGE`, `PROXVIEW_PORT`, `PROXVIEW_IMAGE`, `PROXVIEW_ADMIN_USER`,
+`PROXVIEW_ADMIN_PASSWORD`.)
 
 ## Adding a Proxmox VE site
 

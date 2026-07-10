@@ -26,8 +26,10 @@ TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-local}"      # where CT templates live
 UNPRIVILEGED="${UNPRIVILEGED:-1}"
 PROXVIEW_IMAGE="${PROXVIEW_IMAGE:-ghcr.io/abarbarich/proxview:latest}"
 PROXVIEW_PORT="${PROXVIEW_PORT:-8080}"
-PROXVIEW_USER="${PROXVIEW_USER:-admin}"
-PROXVIEW_PASSWORD="${PROXVIEW_PASSWORD:-}"         # blank = auto-generate a strong one
+# Same names as the Docker/compose deploy (PROXVIEW_ADMIN_*), with short aliases.
+# Blank password = auto-generate a strong one and print it at the end.
+PROXVIEW_USER="${PROXVIEW_ADMIN_USER:-${PROXVIEW_USER:-admin}}"
+PROXVIEW_PASSWORD="${PROXVIEW_ADMIN_PASSWORD:-${PROXVIEW_PASSWORD:-}}"
 
 # ---- pretty logging --------------------------------------------------------
 B=$'\033[1m'; G=$'\033[1;32m'; Y=$'\033[1;33m'; R=$'\033[1;31m'; C=$'\033[1;36m'; N=$'\033[0m'
