@@ -77,6 +77,29 @@ DEMO=1 docker compose up -d --build
 > `ghcr.io/abarbarich/proxview:latest` on each tagged release — set that as the `app`
 > service's `image:` in `docker-compose.yml` to pull instead of build.
 
+## Deploy as a Proxmox LXC (one command)
+
+Already running Proxmox? Give ProxView its own **Debian 12 LXC**. The script creates the
+container, installs Docker, runs ProxView, and prints the URL + one-time setup token. Run
+it **on a Proxmox VE host** as root:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
+```
+
+Defaults to an unprivileged CT — 2 vCPU / 1 GB RAM / 6 GB disk on `vmbr0` (DHCP). Override
+anything with env vars:
+
+```bash
+CTID=131 STORAGE=local-zfs RAM_MB=2048 \
+  NET=192.168.1.50/24 GATEWAY=192.168.1.1 \
+  bash -c "$(curl -fsSL https://raw.githubusercontent.com/abarbarich/proxview/main/proxmox/proxview-lxc.sh)"
+```
+
+The container is **LAN-only** — reach it across networks with the in-app Cloudflare/Tailscale
+wizards. (Tunables: `CTID`, `CT_HOSTNAME`, `CORES`, `RAM_MB`, `DISK_GB`, `BRIDGE`, `NET`,
+`GATEWAY`, `STORAGE`, `PROXVIEW_PORT`, `PROXVIEW_IMAGE`.)
+
 ## Adding a Proxmox VE site
 
 1. In Proxmox: **Datacenter → Permissions → API Tokens**, create a token for a user with
