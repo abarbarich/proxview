@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import OverviewPage from './pages/OverviewPage';
 import SettingsPage from './pages/SettingsPage';
 import NodeDetailPage from './pages/NodeDetailPage';
+import GuestDetailPage from './pages/GuestDetailPage';
 import PbsDetailPage from './pages/PbsDetailPage';
 
 function Protected({ children }: { children: ReactNode }) {
@@ -69,6 +70,14 @@ export default function App() {
           element={
             <Protected>
               <NodeDetailPage />
+            </Protected>
+          }
+        />
+        <Route
+          path="/site/:siteId/node/:node/guest/:vmid"
+          element={
+            <Protected>
+              <GuestDetailPage />
             </Protected>
           }
         />

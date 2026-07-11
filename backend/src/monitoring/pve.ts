@@ -130,6 +130,8 @@ export async function buildPveSnapshot(cfg: PveConfig): Promise<SiteSnapshot> {
         maxcpu: r.maxcpu ?? 0,
         mem: r.mem ?? 0,
         maxmem: r.maxmem ?? 0,
+        disk: r.disk ?? 0,
+        maxdisk: r.maxdisk ?? 0,
         uptime: r.uptime ?? 0,
       };
       nodeMap.get(guest.node)?.guests.push(guest);

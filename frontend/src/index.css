@@ -427,22 +427,6 @@ a {
 .conn.off .conn-dot {
   background: var(--crit);
 }
-.theme-toggle {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: transparent;
-  border: 1px solid var(--border-strong);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
-}
-.theme-toggle:hover {
-  color: var(--text);
-  background: var(--surface-2);
-}
 
 .content-scroll {
   margin-left: 66px;
@@ -724,6 +708,18 @@ a {
 }
 .guest-off {
   opacity: 0.5;
+}
+.guest-link {
+  cursor: pointer;
+}
+/* Clickable rows get an accent-tinted hover so the navigation target is clear
+   (and distinct from the card's own hover). */
+.guest-link:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.guest-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 .type-chip {
   font-size: 9.5px;
@@ -1292,22 +1288,22 @@ a {
    the OS overlay renderer and ignore ::-webkit-scrollbar, which is what forces a
    classic, always-visible (layout-occupying) bar. */
 .guest-list::-webkit-scrollbar,
-.pbs-card .node-guests::-webkit-scrollbar {
+.pbs-card .backup-list::-webkit-scrollbar {
   width: 10px;
 }
 .guest-list::-webkit-scrollbar-track,
-.pbs-card .node-guests::-webkit-scrollbar-track {
+.pbs-card .backup-list::-webkit-scrollbar-track {
   background: var(--surface-2);
   border-radius: 5px;
 }
 .guest-list::-webkit-scrollbar-thumb,
-.pbs-card .node-guests::-webkit-scrollbar-thumb {
+.pbs-card .backup-list::-webkit-scrollbar-thumb {
   background: var(--text-faint);
   border-radius: 5px;
   border: 2px solid var(--surface-2);
 }
 .guest-list::-webkit-scrollbar-thumb:hover,
-.pbs-card .node-guests::-webkit-scrollbar-thumb:hover {
+.pbs-card .backup-list::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
 /* Per-type guest tally in the card header. */
@@ -1334,7 +1330,9 @@ a {
 .tally-down {
   color: var(--text-faint);
 }
-.node-card:hover {
+/* Don't highlight the whole card when a guest row inside it is being hovered —
+   the row highlights on its own (it navigates independently of the card link). */
+.node-card:hover:not(:has(.guest-link:hover)) {
   border-color: var(--border-strong);
   background: var(--surface-2);
 }

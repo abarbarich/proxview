@@ -96,7 +96,7 @@ export function NodeCard({ node, siteId, siteName }: Props) {
               {node.guests.length === 0 ? (
                 <div className="guest-empty">No guests on this node</div>
               ) : (
-                node.guests.map((g) => <GuestRow key={g.id} guest={g} />)
+                node.guests.map((g) => <GuestRow key={g.id} guest={g} siteId={siteId} />)
               )}
             </div>
           </div>

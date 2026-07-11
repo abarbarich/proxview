@@ -11,6 +11,8 @@ export interface GuestSummary {
   maxcpu: number; // assigned vCPUs
   mem: number; // bytes
   maxmem: number; // bytes
+  disk: number; // bytes used (0 for VMs without guest agent)
+  maxdisk: number; // bytes provisioned
   uptime: number; // seconds
 }
 

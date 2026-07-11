@@ -129,6 +129,8 @@ export function demoSnapshots(now: number): SiteSnapshot[] {
         const running = g.running;
         const cpu = running ? Math.min(0.98, g.load + 0.25 * wave(g.name, now, 9000)) : 0;
         const memFrac = running ? 0.45 + 0.25 * wave(g.name + 'm', now, 15000) : 0;
+        const diskGb = g.type === 'lxc' ? 8 : 32;
+        const diskFrac = 0.25 + 0.3 * wave(g.name + 'd', now, 60000);
         return {
           id: `${g.type}/${g.vmid}`,
           vmid: g.vmid,
@@ -140,6 +142,8 @@ export function demoSnapshots(now: number): SiteSnapshot[] {
           maxcpu: g.cores,
           mem: Math.round(memFrac * g.memGb * GB),
           maxmem: g.memGb * GB,
+          disk: Math.round(diskFrac * diskGb * GB),
+          maxdisk: diskGb * GB,
           uptime: running ? Math.floor((now - BOOT_REF) / 1000) - g.vmid * 137 : 0,
         };
       });

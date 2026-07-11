@@ -13,7 +13,12 @@ export function nodeSeriesKey(siteId: string, node: string, metric: string): str
   return `${siteId}:node:${node}:${metric}`;
 }
 
-/** Persist node-level samples from a poll. Fraction metrics (cpu, mem) stored 0..1. */
+/** Per-guest series key. vmid is cluster-unique in PVE, so it needs no node segment. */
+export function guestSeriesKey(siteId: string, vmid: number, metric: string): string {
+  return `${siteId}:guest:${vmid}:${metric}`;
+}
+
+/** Persist node- and guest-level samples from a poll. Fraction metrics (cpu, mem) stored 0..1. */
 export function recordSnapshot(snap: SiteSnapshot): void {
   if (!snap.reachable) return;
   const ts = Math.floor(snap.updatedAt / 1000);
@@ -22,6 +27,11 @@ export function recordSnapshot(snap: SiteSnapshot): void {
     if (n.status !== 'online') continue;
     rows.push([nodeSeriesKey(snap.siteId, n.node, 'cpu'), ts, n.cpu]);
     rows.push([nodeSeriesKey(snap.siteId, n.node, 'mem'), ts, n.maxmem ? n.mem / n.maxmem : 0]);
+    for (const g of n.guests) {
+      if (g.status !== 'running') continue;
+      rows.push([guestSeriesKey(snap.siteId, g.vmid, 'cpu'), ts, g.cpu]);
+      rows.push([guestSeriesKey(snap.siteId, g.vmid, 'mem'), ts, g.maxmem ? g.mem / g.maxmem : 0]);
+    }
   }
   if (!rows.length) return;
   const stmt = getDb().prepare('INSERT INTO timeseries(series_key, ts, value) VALUES(?, ?, ?)');

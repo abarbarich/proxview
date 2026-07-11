@@ -5,6 +5,7 @@ import { ColumnSelect } from '../components/ColumnSelect';
 import { ConnectivityPanel } from '../components/ConnectivityPanel';
 import { NotificationsPanel } from '../components/NotificationsPanel';
 import { SiteFormModal } from '../components/SiteFormModal';
+import { ThemeSelect } from '../components/ThemeSelect';
 import { useLive } from '../store/live';
 import { useSites } from '../store/sites';
 import type { SitePublic } from '../types';
@@ -145,6 +146,15 @@ export default function SettingsPage() {
                 </p>
               </div>
               <ColumnSelect />
+            </div>
+            <div className="panel-head" style={{ marginBottom: 0 }}>
+              <div>
+                <h2>Theme</h2>
+                <p className="ssh-hint" style={{ margin: '4px 0 0' }}>
+                  Follows your system setting by default.
+                </p>
+              </div>
+              <ThemeSelect />
             </div>
           </section>
         )}

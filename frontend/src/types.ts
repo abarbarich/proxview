@@ -18,6 +18,8 @@ export interface GuestSummary {
   maxcpu: number;
   mem: number;
   maxmem: number;
+  disk: number;
+  maxdisk: number;
   uptime: number;
 }
 

@@ -158,7 +158,7 @@ export default function NodeDetailPage() {
           {nodeData.guests.length === 0 ? (
             <div className="guest-empty">No guests on this node</div>
           ) : (
-            nodeData.guests.map((g) => <GuestRow key={g.id} guest={g} />)
+            nodeData.guests.map((g) => <GuestRow key={g.id} guest={g} siteId={siteId} />)
           )}
         </div>
       </section>
