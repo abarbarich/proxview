@@ -54,6 +54,8 @@ interface RawGroup {
 }
 interface RawHost {
   cpu?: number;
+  cpuinfo?: { cpus?: number; model?: string };
+  kversion?: string;
   memory?: { used?: number; total?: number };
   uptime?: number;
 }
@@ -163,6 +165,7 @@ export async function buildPbsSnapshot(cfg: PbsConfig): Promise<PbsSnapshot> {
     siteId: cfg.siteId,
     name: cfg.name,
     kind: 'pbs',
+    webUrl: cfg.baseUrl,
     updatedAt: Date.now(),
   };
 
@@ -226,6 +229,9 @@ export async function buildPbsSnapshot(cfg: PbsConfig): Promise<PbsSnapshot> {
     host: host
       ? {
           cpu: host.cpu ?? 0,
+          maxcpu: host.cpuinfo?.cpus,
+          cpuModel: host.cpuinfo?.model,
+          kernel: host.kversion,
           mem: host.memory?.used ?? 0,
           maxmem: host.memory?.total ?? 0,
           uptime: host.uptime ?? 0,

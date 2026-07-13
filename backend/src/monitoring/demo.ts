@@ -107,13 +107,22 @@ function wave(key: string, now: number, periodMs: number): number {
   return (Math.sin(now / periodMs + seed(key)) + 1) / 2;
 }
 
+const DEMO_CPUS = [
+  'AMD Ryzen 7 5800X 8-Core Processor',
+  'Intel(R) Xeon(R) E-2288G CPU @ 3.70GHz',
+  'Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz',
+  'AMD Ryzen 5 5600G with Radeon Graphics',
+];
+
 export function demoSnapshots(now: number): SiteSnapshot[] {
-  return TOPOLOGY.map((site) => {
+  return TOPOLOGY.map((site, si) => {
     const nodes: NodeSummary[] = site.nodes.map((n) => {
+      const ip = `10.20.${si}.${20 + (seed(n.node) % 200)}`;
       if (!n.online) {
         return {
           node: n.node,
           status: 'offline',
+          ip,
           cpu: 0,
           maxcpu: n.cores,
           mem: 0,
@@ -155,6 +164,7 @@ export function demoSnapshots(now: number): SiteSnapshot[] {
       return {
         node: n.node,
         status: 'online',
+        ip,
         cpu,
         maxcpu: n.cores,
         mem: Math.round(memFrac * n.memGb * GB),
@@ -167,6 +177,11 @@ export function demoSnapshots(now: number): SiteSnapshot[] {
           Number((cpu * n.cores * 0.8).toFixed(2)),
           Number((cpu * n.cores * 0.7).toFixed(2)),
         ],
+        iowait: Number((0.008 + 0.05 * wave(`${n.node}io`, now, 8000)).toFixed(3)),
+        swap: Math.round((0.04 + 0.1 * wave(`${n.node}sw`, now, 30000)) * 8 * GB),
+        maxswap: 8 * GB,
+        cpuModel: DEMO_CPUS[seed(n.node) % DEMO_CPUS.length],
+        kernel: 'Linux 6.8.12-4-pve',
         temps: {
           cpu: cpuTemp,
           readings: [
@@ -213,9 +228,13 @@ export function demoPbsSnapshots(now: number): PbsSnapshot[] {
       siteId: 'demo-pbs',
       name: 'Backup Server',
       kind: 'pbs',
+      webUrl: 'https://10.20.9.5:8007',
       reachable: true,
       host: {
         cpu: 0.06 + 0.08 * wave('pbscpu', now, 9000),
+        maxcpu: 6,
+        cpuModel: 'Intel(R) Core(TM) i5-8500T CPU @ 2.10GHz',
+        kernel: 'Linux 6.8.12-4-pve',
         mem: Math.round((0.25 + 0.08 * wave('pbsmem', now, 15000)) * 32 * GB),
         maxmem: 32 * GB,
         uptime: Math.floor((now - BOOT_REF) / 1000) - 40000,

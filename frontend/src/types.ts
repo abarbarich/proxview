@@ -37,6 +37,7 @@ export interface NodeTemps {
 export interface NodeSummary {
   node: string;
   status: 'online' | 'offline';
+  ip?: string; // node management IP
   cpu: number;
   maxcpu: number;
   mem: number;
@@ -45,6 +46,11 @@ export interface NodeSummary {
   maxdisk: number;
   uptime: number;
   loadavg?: number[];
+  iowait?: number; // 0..1
+  swap?: number;
+  maxswap?: number;
+  cpuModel?: string;
+  kernel?: string;
   temps?: NodeTemps;
   power?: number;
   systemPower?: number;
@@ -89,9 +95,18 @@ export interface PbsSnapshot {
   siteId: string;
   name: string;
   kind: 'pbs';
+  webUrl?: string;
   reachable: boolean;
   error?: string;
-  host?: { cpu: number; mem: number; maxmem: number; uptime: number };
+  host?: {
+    cpu: number;
+    maxcpu?: number;
+    cpuModel?: string;
+    kernel?: string;
+    mem: number;
+    maxmem: number;
+    uptime: number;
+  };
   temps?: NodeTemps;
   power?: number;
   systemPower?: number;

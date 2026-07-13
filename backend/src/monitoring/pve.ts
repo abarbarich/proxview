@@ -59,8 +59,17 @@ interface RawResource {
 interface RawClusterStatus {
   type: string;
   name?: string;
+  ip?: string; // node management IP (node rows only)
   online?: number;
   quorate?: number;
+}
+
+interface RawNodeStatus {
+  loadavg?: string[]; // 1/5/15-min load average, returned as strings
+  wait?: number; // iowait fraction 0..1
+  kversion?: string; // running kernel, e.g. "Linux 6.8.12-1-pve ..."
+  cpuinfo?: { model?: string; cpus?: number; cores?: number; sockets?: number };
+  swap?: { used?: number; total?: number };
 }
 
 export async function testPve(cfg: PveConfig): Promise<{ ok: boolean; message: string }> {
@@ -94,8 +103,12 @@ export async function buildPveSnapshot(cfg: PveConfig): Promise<SiteSnapshot> {
 
     const cluster = status.find((s) => s.type === 'cluster');
     const onlineByName = new Map<string, boolean>();
+    const ipByName = new Map<string, string>();
     for (const s of status) {
-      if (s.type === 'node' && s.name) onlineByName.set(s.name, s.online === 1);
+      if (s.type === 'node' && s.name) {
+        onlineByName.set(s.name, s.online === 1);
+        if (s.ip) ipByName.set(s.name, s.ip);
+      }
     }
 
     const nodeMap = new Map<string, NodeSummary>();
@@ -105,6 +118,7 @@ export async function buildPveSnapshot(cfg: PveConfig): Promise<SiteSnapshot> {
       nodeMap.set(r.node, {
         node: r.node,
         status: online ? 'online' : 'offline',
+        ip: ipByName.get(r.node),
         cpu: r.cpu ?? 0,
         maxcpu: r.maxcpu ?? 0,
         mem: r.mem ?? 0,
@@ -139,6 +153,29 @@ export async function buildPveSnapshot(cfg: PveConfig): Promise<SiteSnapshot> {
 
     const nodes = [...nodeMap.values()].sort((a, b) => a.node.localeCompare(b.node));
     for (const n of nodes) n.guests.sort((a, b) => a.vmid - b.vmid);
+
+    // Enrich online nodes with load average from their per-node status — /cluster/resources
+    // doesn't carry loadavg. Best-effort and parallel: a node that briefly 5xxs just skips it.
+    await Promise.all(
+      nodes
+        .filter((n) => n.status === 'online')
+        .map(async (n) => {
+          try {
+            const st = await pveGet<RawNodeStatus>(cfg, `/nodes/${encodeURIComponent(n.node)}/status`);
+            const la = st.loadavg?.map(Number).filter((x) => Number.isFinite(x));
+            if (la && la.length) n.loadavg = la;
+            if (typeof st.wait === 'number') n.iowait = st.wait;
+            if (st.swap?.total) {
+              n.swap = st.swap.used ?? 0;
+              n.maxswap = st.swap.total;
+            }
+            if (st.cpuinfo?.model) n.cpuModel = st.cpuinfo.model;
+            if (st.kversion) n.kernel = st.kversion;
+          } catch {
+            /* per-node status can be momentarily unavailable — leave the extras unset */
+          }
+        }),
+    );
 
     return {
       ...base,

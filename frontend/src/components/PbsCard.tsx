@@ -43,7 +43,10 @@ export function PbsCard({ pbs }: { pbs: PbsSnapshot }) {
         <>
           {pbs.host && (
             <div className="node-metrics">
-              <Gauge value={pbs.host.cpu * 100} label="host cpu" />
+              <Gauge
+                value={pbs.host.cpu * 100}
+                label={pbs.host.maxcpu ? `${pbs.host.maxcpu} cores` : 'host cpu'}
+              />
               <div className="node-meters">
                 <MeterBar label="MEM" used={pbs.host.mem} total={pbs.host.maxmem} />
               </div>

@@ -1,3 +1,4 @@
+import type { KeyboardEvent, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { formatUptime } from '../lib/format';
 import type { NodeSummary } from '../types';
@@ -24,6 +25,15 @@ export function NodeCard({ node, siteId, siteName }: Props) {
   const vm = tally('qemu');
   const ct = tally('lxc');
 
+  const webUi = node.ip ? `https://${node.ip}:8006` : undefined;
+  // The whole card is a <Link>, so nesting an <a> is invalid — open the web UI via a span
+  // handler and stop the click from also triggering the card's navigation.
+  const openWebUi = (e: MouseEvent | KeyboardEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (webUi) window.open(webUi, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <Link
       to={`/site/${encodeURIComponent(siteId)}/node/${encodeURIComponent(node.node)}`}
@@ -39,7 +49,23 @@ export function NodeCard({ node, siteId, siteName }: Props) {
             <span className="node-name">{node.node}</span>
           </div>
         </div>
-        <span className="node-uptime">{offline ? 'offline' : `up ${formatUptime(node.uptime)}`}</span>
+        <div className="node-head-right">
+          {node.ip && (
+            <span
+              className="node-ip node-ip-link"
+              role="link"
+              tabIndex={0}
+              title={`Open the Proxmox web UI at ${webUi}`}
+              onClick={openWebUi}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') openWebUi(e);
+              }}
+            >
+              {node.ip} ↗
+            </span>
+          )}
+          <span className="node-uptime">{offline ? 'offline' : `up ${formatUptime(node.uptime)}`}</span>
+        </div>
       </div>
 
       {offline ? (
@@ -51,11 +77,6 @@ export function NodeCard({ node, siteId, siteName }: Props) {
             <div className="node-meters">
               <MeterBar label="MEM" used={node.mem} total={node.maxmem} />
               <MeterBar label="DISK" used={node.disk} total={node.maxdisk} />
-              {node.loadavg && (
-                <div className="loadavg">
-                  load <b>{node.loadavg.map((n) => n.toFixed(2)).join('  ')}</b>
-                </div>
-              )}
             </div>
           </div>
 

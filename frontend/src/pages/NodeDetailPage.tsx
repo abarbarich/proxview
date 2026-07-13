@@ -91,7 +91,20 @@ export default function NodeDetailPage() {
           <h1>{nodeData.node}</h1>
           <span className="detail-sub">{site.name}</span>
         </div>
-        <span className="node-uptime">up {formatUptime(nodeData.uptime)}</span>
+        <div className="detail-head-meta">
+          {nodeData.ip && (
+            <a
+              className="webui-link"
+              href={`https://${nodeData.ip}:8006`}
+              target="_blank"
+              rel="noreferrer"
+              title={`Open the Proxmox web UI at https://${nodeData.ip}:8006`}
+            >
+              {nodeData.ip} ↗
+            </a>
+          )}
+          <span className="node-uptime">up {formatUptime(nodeData.uptime)}</span>
+        </div>
       </div>
 
       <div className="detail-stats panel">
@@ -99,6 +112,32 @@ export default function NodeDetailPage() {
         <div className="detail-meters">
           <MeterBar label="MEMORY" used={nodeData.mem} total={nodeData.maxmem} />
           <MeterBar label="DISK" used={nodeData.disk} total={nodeData.maxdisk} />
+          {nodeData.maxswap ? (
+            <MeterBar label="SWAP" used={nodeData.swap ?? 0} total={nodeData.maxswap} />
+          ) : null}
+          {(nodeData.loadavg || nodeData.iowait !== undefined) && (
+            <div className="loadavg">
+              {nodeData.loadavg && (
+                <>
+                  load avg <span className="loadavg-hint">1m/5m/15m</span>{' '}
+                  <b>{nodeData.loadavg.map((n) => n.toFixed(2)).join('  ')}</b>
+                </>
+              )}
+              {nodeData.iowait !== undefined && (
+                <span className="loadavg-io">
+                  {nodeData.loadavg ? ' · ' : ''}iowait <b>{(nodeData.iowait * 100).toFixed(1)}%</b>
+                </span>
+              )}
+            </div>
+          )}
+          {(nodeData.cpuModel || nodeData.kernel) && (
+            <div className="node-sysinfo">
+              {nodeData.cpuModel && <span>{nodeData.cpuModel}</span>}
+              {nodeData.kernel && (
+                <span className="muted-inline">{nodeData.kernel.split(' ').slice(0, 2).join(' ')}</span>
+              )}
+            </div>
+          )}
           {(hasTemps || hasPower || hasSysPower) && (
             <div className="node-temps">
               {nodeData.temps?.readings.map((r) => (

@@ -30,6 +30,7 @@ export interface NodeTemps {
 export interface NodeSummary {
   node: string;
   status: 'online' | 'offline';
+  ip?: string; // node management IP (from /cluster/status)
   cpu: number; // 0..1
   maxcpu: number; // cores
   mem: number; // bytes used
@@ -38,6 +39,11 @@ export interface NodeSummary {
   maxdisk: number; // bytes total
   uptime: number; // seconds
   loadavg?: number[];
+  iowait?: number; // 0..1 CPU time waiting on I/O
+  swap?: number; // bytes used
+  maxswap?: number; // bytes total
+  cpuModel?: string;
+  kernel?: string; // running kernel version string
   temps?: NodeTemps;
   power?: number; // CPU package watts (RAPL)
   systemPower?: number; // whole-system watts (IPMI)
@@ -83,9 +89,18 @@ export interface PbsSnapshot {
   siteId: string;
   name: string;
   kind: 'pbs';
+  webUrl?: string; // configured base URL, e.g. https://host:8007
   reachable: boolean;
   error?: string;
-  host?: { cpu: number; mem: number; maxmem: number; uptime: number };
+  host?: {
+    cpu: number;
+    maxcpu?: number; // logical CPU count
+    cpuModel?: string;
+    kernel?: string;
+    mem: number;
+    maxmem: number;
+    uptime: number;
+  };
   temps?: NodeTemps;
   power?: number; // CPU package watts (RAPL)
   systemPower?: number; // whole-system watts (IPMI)
