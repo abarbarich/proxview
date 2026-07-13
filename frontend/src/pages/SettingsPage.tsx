@@ -6,6 +6,7 @@ import { ConnectivityPanel } from '../components/ConnectivityPanel';
 import { NotificationsPanel } from '../components/NotificationsPanel';
 import { SiteFormModal } from '../components/SiteFormModal';
 import { ThemeSelect } from '../components/ThemeSelect';
+import { useAuth } from '../store/auth';
 import { useLive } from '../store/live';
 import { useSites } from '../store/sites';
 import type { SitePublic } from '../types';
@@ -24,6 +25,7 @@ const SECTIONS: { id: SectionId; label: string }[] = [
 export default function SettingsPage() {
   const { sites, loaded, load, remove, importConfig } = useSites();
   const demo = useLive((s) => s.demo);
+  const version = useAuth((s) => s.version);
 
   const [active, setActive] = useState<SectionId>('sites');
   const [modal, setModal] = useState<{ open: boolean; site: SitePublic | null }>({
@@ -68,6 +70,11 @@ export default function SettingsPage() {
             {s.label}
           </button>
         ))}
+        {version && (
+          <div className="settings-nav-foot">
+            ProxView {/^\d/.test(version) ? `v${version}` : version}
+          </div>
+        )}
       </nav>
 
       <div className="settings-content">

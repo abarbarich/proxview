@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useAuth } from '../store/auth';
 import { BrandMark } from './BrandMark';
 import { LoginEmojiBackground } from './LoginEmojiBackground';
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function AuthCard({ title, subtitle, children }: Props) {
+  const version = useAuth((s) => s.version);
   return (
     <div className="landing">
       <LoginEmojiBackground />
@@ -21,6 +23,11 @@ export function AuthCard({ title, subtitle, children }: Props) {
         {subtitle && <p className="tagline">{subtitle}</p>}
         {children}
       </div>
+      {version && (
+        <div className="landing-version">
+          ProxView {/^\d/.test(version) ? `v${version}` : version}
+        </div>
+      )}
     </div>
   );
 }

@@ -21,6 +21,9 @@ WORKDIR /app
 ENV NODE_ENV=production \
     PORT=8080 \
     DATA_DIR=/data
+# Release version, injected by CI (`docker build --build-arg VERSION=x.y.z`) — surfaced in the UI.
+ARG VERSION=dev
+ENV PROXVIEW_VERSION=$VERSION
 # Optional remote-access tunnels, applied in-app by the setup wizards:
 #   tailscale/tailscaled (Alpine community repo) + cloudflared (static binary).
 # buildkit populates TARGETARCH (amd64 / arm64) for the target platform.

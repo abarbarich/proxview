@@ -11,6 +11,7 @@ export type AuthPhase = 'loading' | 'needs-setup' | 'anon' | 'authed';
 interface AuthState {
   phase: AuthPhase;
   user: User | null;
+  version: string | null;
   bootstrap: () => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   setup: (token: string, username: string, password: string) => Promise<void>;
@@ -20,8 +21,14 @@ interface AuthState {
 export const useAuth = create<AuthState>((set) => ({
   phase: 'loading',
   user: null,
+  version: null,
 
   async bootstrap() {
+    // Public endpoint — fetch the running version for the login/splash + settings (best-effort).
+    void api
+      .get<{ version?: string }>('/api/health')
+      .then((h) => h?.version && set({ version: h.version }))
+      .catch(() => {});
     try {
       const s = await api.get<{ needsSetup: boolean }>('/api/setup/status');
       if (s.needsSetup) {

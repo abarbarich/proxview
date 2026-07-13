@@ -16,7 +16,9 @@ export const env = {
   dataDir: resolve(process.env.DATA_DIR ?? './data'),
   /** Serve synthetic data so the UI is fully explorable without a real cluster. */
   demo: bool(process.env.DEMO),
-  version: process.env.npm_package_version ?? '0.1.0',
+  // Release version: injected into the image at build time (CI passes the git tag as the
+  // VERSION build-arg → PROXVIEW_VERSION). Falls back to the package version in local dev.
+  version: process.env.PROXVIEW_VERSION || process.env.npm_package_version || '0.1.0',
   /** Built frontend, relative to the compiled backend/dist/index.js. */
   frontendDir: resolve(
     process.env.FRONTEND_DIR ?? new URL('../../../frontend/dist', import.meta.url).pathname,

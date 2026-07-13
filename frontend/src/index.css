@@ -121,6 +121,19 @@ a {
   padding: 32px;
 }
 
+.landing-version {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -2193,6 +2206,14 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+}
+.settings-nav-foot {
+  margin-left: auto;
+  align-self: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  padding: 0 4px;
 }
 .settings-nav-item {
   padding: 8px 14px;
