@@ -23,7 +23,8 @@ migrates, or changes anything on your nodes — it's a dashboard, not a controll
 - 📈 **History charts** (CPU / memory / temperature) with 1h · 24h · 7d ranges
 - 💾 **PBS backup health** — datastore fullness, backup freshness, GC & verify status
 - 🌡️ **Temperatures via SSH** (`lm-sensors`) — the one thing the Proxmox API can't give you
-- 🔔 **At-a-glance alerts** — offline nodes, near-full datastores, stale backups, hot CPUs
+- 🔔 **Alerts that reach you** — offline nodes, near-full datastores, stale backups, hot CPUs;
+  on-screen **and** via Telegram, Slack, email or browser push ([details](docs/notifications.md))
 - 🔒 **Secure by default** — first-run admin setup, encrypted credentials, localhost-only core
 - 🌐 **Optional remote access** — guided in-app Cloudflare Tunnel & Tailscale wizards (no `.env` edits)
 
@@ -130,6 +131,27 @@ Click any node to drill into per-metric history (CPU · memory · temperature ·
 
 ![Node detail — CPU, memory, temperature and power history charts](docs/screenshots/node-detail.png)
 
+## Notifications & alerts
+
+ProxView doesn't just draw graphs — it watches your sites and **tells you when something's
+wrong**. Every alert shows on-screen as a banner, and you can add delivery channels so you
+hear about it even when the dashboard is closed:
+
+- **Channels** — **Telegram**, **Slack**, **email (SMTP)**, and **browser (web) push**. Add
+  as many as you like under **Settings → Notifications**, each with its own minimum severity
+  (e.g. critical-only Telegram + all-alerts email) and a one-click **Send test**.
+- **Rules** — 12 built-in conditions (node offline, memory/CPU/temp/power, datastore full,
+  stale backups, GC/verify failed, lost quorum, …), each with an enable toggle, warning/
+  critical severity, and a threshold. Tune them under **Settings → Alert rules**.
+- **Smart delivery** — an alert must persist for a couple of polls before it fires (no paging
+  on a single blip), optional reminders while it's still active, and a "resolved" note when it
+  clears.
+
+Channel credentials are stored **AES-256-GCM encrypted at rest**, just like your site tokens.
+
+👉 **Full setup guide, all rules and their defaults, and troubleshooting:
+[docs/notifications.md](docs/notifications.md).**
+
 ## Local development
 
 ```bash
@@ -211,8 +233,8 @@ are still here: set `CF_TUNNEL_TOKEN` / `TS_AUTHKEY` in `.env` and use
 | `DEMO` | `0` | `1` serves synthetic data |
 | `PROXVIEW_SECRET_KEY` | auto | 32-byte hex key for credential encryption |
 | `PROXVIEW_ADMIN_USER` / `PROXVIEW_ADMIN_PASSWORD` | — | Auto-provision the admin on first boot (skips the setup token). Handy for scripted deploys |
-| `POLL_INTERVAL_MS` | `10000` | PVE/PBS poll cadence |
-| `TEMP_INTERVAL_MS` | `45000` | SSH temperature poll cadence |
+| `POLL_INTERVAL_MS` | `10000` | PVE/PBS poll cadence — **seeds the default only**; edit live under Settings → Alert rules |
+| `TEMP_INTERVAL_MS` | `45000` | SSH temperature poll cadence — **seeds the default only**; edit live under Settings → Alert rules |
 | `RETENTION_DAYS` | `30` | Time-series retention |
 | `COOKIE_SECURE` | `0` | Set `1` when always behind HTTPS |
 
